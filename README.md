@@ -1,6 +1,6 @@
 # Client Photo Select
 
-A desktop application that lets photographers deliver photo galleries to clients for selection, rating, and commenting — all without any cloud service, subscription, or internet connection.
+A desktop application that lets photographers deliver photo galleries to clients for selection, rating, and commenting  all without any cloud service, subscription, or internet connection.
 
 The photographer builds a self-contained client package (a folder with a portable `.exe` and generated previews), ZIPs it, and sends it to the client. The client opens it on their Windows machine, reviews the photos, and saves their picks. The photographer opens the same folder, runs an export, and gets a CSV + summary ready to send back.
 
