@@ -1,6 +1,6 @@
 <div align="center">
 
-# Client Photo Select
+# 📷 Client Photo Select
 
 **Offline photographer client gallery — deliver photos for selection, rating, and commenting without any cloud service.**
 
@@ -8,19 +8,19 @@
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows)]()
 [![Showcase](https://img.shields.io/badge/Source-Private%20Showcase-lightgrey?style=flat-square)]()
 
-> Private source — this repository is a project showcase.
+> 🔒 Private source — this repository is a project showcase.
 
 </div>
 
 ---
 
-## How It Works
+## ⚙️ How It Works
 
 The photographer builds a self-contained client package — a folder with a portable `.exe` and generated previews — ZIPs it, and sends it to the client. The client opens it on their Windows machine, reviews the photos, and saves their picks. The photographer opens the same folder, exports, and gets a CSV and summary ready to send back.
 
 ```
-Photographer                          Client
-────────────                          ──────
+📸 Photographer                       👤 Client
+────────────────                      ─────────
 1. Open app                           4. Receives ZIP
 2. Run setup wizard                   5. Unzips, runs .exe
 3. ZIP & send folder  ──────────────► 6. Rates / picks / comments
@@ -32,33 +32,33 @@ Photographer                          Client
 
 ---
 
-## Features
+## ✨ Features
 
-### For the Photographer
+### 📸 For the Photographer
 
-- **Setup wizard** — point at a folder of originals; previews and thumbnails are generated automatically
-- **Watermark support** — logo image or custom text, with configurable opacity, scale, and position
-- **Custom branding** — studio name, photographer name, Instagram handle, and custom EXE icon; the client sees your brand
-- **Export** — one click writes three files to an `exports/` folder:
-  - `selection_report.csv` — full table of every photo with rating, flag, selection, and comment
-  - `selection_summary.txt` — human-readable sections grouped by rating, flag, and selection status
-  - `lightroom_selected_names.txt` — comma-separated filenames ready to paste into Lightroom's filter bar
-- **Burst deduplication** — collapses burst-suffix filenames (`_A747902-3`, `_A747902-4` → `_A747902`) in the name list
-- **Compose email** — opens the default mail client via Windows MAPI with all three files pre-attached
+- 🧙 **Setup wizard** — point at a folder of originals; previews and thumbnails are generated automatically
+- 💧 **Watermark support** — logo image or custom text, with configurable opacity, scale, and position
+- 🎨 **Custom branding** — studio name, photographer name, Instagram handle, and custom EXE icon; the client sees your brand
+- 📤 **Export** — one click writes three files to an `exports/` folder:
+  - 📊 `selection_report.csv` — full table with rating, flag, selection, and comment for every photo
+  - 📝 `selection_summary.txt` — human-readable sections grouped by rating, flag, and selection status
+  - 🖼️ `lightroom_selected_names.txt` — comma-separated filenames ready to paste into Lightroom's filter bar
+- 📸 **Burst deduplication** — collapses burst-suffix filenames (`_A747902-3`, `_A747902-4` → `_A747902`) in the name list
+- 📧 **Compose email** — opens the default mail client via Windows MAPI with all three files pre-attached
 
-### For the Client
+### 👤 For the Client
 
-- **Photo grid** — responsive thumbnail grid with live filtering by rating, flag, and selection status
-- **Detail viewer** — full-size preview with keyboard navigation, thumbnail strip, star rating, and pick/reject controls
-- **Per-photo notes** — collapsible comment field with autosave; keyboard shortcut `C`
-- **Keyboard-first** — arrows to navigate, `1`–`5` to rate, `P` / `X` / `U` to pick/reject/clear, `Enter` in note to save and advance
-- **Undo/redo** — full undo stack for ratings, flags, selections, and comments
-- **Bulk operations** — checkbox multi-select for applying flags, ratings, or comments to many photos at once
-- **Fully offline** — no internet required; all data lives in a local SQLite database beside the photos
+- 🖼️ **Photo grid** — responsive thumbnail grid with live filtering by rating, flag, and selection status
+- 🔍 **Detail viewer** — full-size preview with keyboard navigation, thumbnail strip, star rating, and pick/reject controls
+- 📝 **Per-photo notes** — collapsible comment field with autosave; keyboard shortcut `C`
+- ⌨️ **Keyboard-first** — arrows to navigate, `1`–`5` to rate, `P` / `X` / `U` to pick/reject/clear
+- ↩️ **Undo/redo** — full undo stack for ratings, flags, selections, and comments
+- ☑️ **Bulk operations** — checkbox multi-select for applying flags, ratings, or comments to many photos at once
+- 📵 **Fully offline** — no internet required; all data lives in a local SQLite database beside the photos
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |:---|:---|
@@ -73,7 +73,7 @@ Photographer                          Client
 
 ---
 
-## Architecture
+## 🏗️ Architecture
 
 ```
 src/                      React + TypeScript frontend
@@ -91,20 +91,18 @@ src-tauri/src/
   icon_embed.rs           Embed custom PNG as Windows EXE icon at runtime
 ```
 
-**Data flow:** originals are scanned on setup, previews generated in parallel via rayon, metadata written to SQLite. All client actions (ratings, flags, comments) write immediately with undo entries. Export reads all rows, formats three output files, and deduplicates burst filenames if enabled.
+---
+
+## 💡 Key Decisions
+
+**🪶 Why Tauri?** Produces a ~5 MB binary using the OS WebView instead of bundling Chromium (~150 MB) — important for a tool photographers ZIP and send to clients.
+
+**🗄️ Why local SQLite?** Zero infrastructure. The database travels with the ZIP. No accounts, no sync, no server.
+
+**📧 Why Simple MAPI?** `mailto:` URLs can't attach files reliably across mail clients on Windows. MAPI opens a compose window in the user's actual mail app with files pre-attached.
 
 ---
 
-## Key Decisions
+## 📊 Status
 
-**Why Tauri?** Produces a ~5 MB binary using the OS WebView instead of bundling Chromium (~150 MB) — important for a tool photographers ZIP and send to clients.
-
-**Why local SQLite?** Zero infrastructure. The database travels with the ZIP. No accounts, no sync, no server.
-
-**Why Simple MAPI?** `mailto:` URLs can't attach files reliably across mail clients on Windows. MAPI opens a compose window in the user's actual mail app with files pre-attached.
-
----
-
-## Status
-
-Active development. Private source — this repository is a project showcase.
+Active development. 🔒 Private source — this repository is a project showcase.
