@@ -1,19 +1,29 @@
+<div align="center">
+
 # Client Photo Select
 
-A desktop application that lets photographers deliver photo galleries to clients for selection, rating, and commenting  all without any cloud service, subscription, or internet connection.
+**Offline photographer client gallery — deliver photos for selection, rating, and commenting without any cloud service.**
 
-The photographer builds a self-contained client package (a folder with a portable `.exe` and generated previews), ZIPs it, and sends it to the client. The client opens it on their Windows machine, reviews the photos, and saves their picks. The photographer opens the same folder, runs an export, and gets a CSV + summary ready to send back.
+[![Stack: Tauri v2 / Rust / React](https://img.shields.io/badge/Stack-Tauri%20v2%20%2F%20Rust%20%2F%20React-FFC131?style=flat-square)]()
+[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows)]()
+[![Showcase](https://img.shields.io/badge/Source-Private%20Showcase-lightgrey?style=flat-square)]()
+
+> Private source — this repository is a project showcase.
+
+</div>
 
 ---
 
 ## How It Works
 
+The photographer builds a self-contained client package — a folder with a portable `.exe` and generated previews — ZIPs it, and sends it to the client. The client opens it on their Windows machine, reviews the photos, and saves their picks. The photographer opens the same folder, exports, and gets a CSV and summary ready to send back.
+
 ```
 Photographer                          Client
-──────────                            ──────
+────────────                          ──────
 1. Open app                           4. Receives ZIP
 2. Run setup wizard                   5. Unzips, runs .exe
-3. ZIP & send folder  ──────────────► 6. Rates / picks photos
+3. ZIP & send folder  ──────────────► 6. Rates / picks / comments
                                       7. Sends folder back
 8. Open folder        ◄──────────────
 9. Export CSV + summary
@@ -25,88 +35,73 @@ Photographer                          Client
 ## Features
 
 ### For the Photographer
-- **Setup wizard** — point at a folder of originals, choose an output location, configure watermarks and branding; previews and thumbnails are generated automatically
-- **Watermark support** — overlay a logo image or custom text on all generated previews; opacity, scale, and position are all configurable
-- **Custom branding** — set studio name, photographer name, Instagram handle, and a custom EXE icon; the client sees your brand, not generic software
-- **Client email field** — stored per-project; pre-filled as the To address when composing export emails
-- **Export** — one click writes three files into an `exports/` folder:
+
+- **Setup wizard** — point at a folder of originals; previews and thumbnails are generated automatically
+- **Watermark support** — logo image or custom text, with configurable opacity, scale, and position
+- **Custom branding** — studio name, photographer name, Instagram handle, and custom EXE icon; the client sees your brand
+- **Export** — one click writes three files to an `exports/` folder:
   - `selection_report.csv` — full table of every photo with rating, flag, selection, and comment
   - `selection_summary.txt` — human-readable sections grouped by rating, flag, and selection status
   - `lightroom_selected_names.txt` — comma-separated filenames ready to paste into Lightroom's filter bar
-- **Burst deduplication** — optional (on by default): strips trailing `-N` suffixes from filenames so `_A747902-3` and `_A747902-4` collapse to a single `_A747902` in the name list
-- **Compose email** — opens the default mail client via Windows MAPI with all three export files attached automatically; falls back to `mailto:` on non-MAPI systems
+- **Burst deduplication** — collapses burst-suffix filenames (`_A747902-3`, `_A747902-4` → `_A747902`) in the name list
+- **Compose email** — opens the default mail client via Windows MAPI with all three files pre-attached
 
 ### For the Client
+
 - **Photo grid** — responsive thumbnail grid with live filtering by rating, flag, and selection status
-- **Detail viewer** — full-size preview with keyboard navigation, thumbnail carousel strip, star rating, pick/reject/clear controls
-- **Collapsible note field** — per-photo comments with autosave; accessible via keyboard shortcut `C`
-- **Keyboard-first** — arrow keys to navigate, `1`–`5` to rate, `P`/`X`/`U` to pick/reject/clear, `Enter` in the note field to save and advance
+- **Detail viewer** — full-size preview with keyboard navigation, thumbnail strip, star rating, and pick/reject controls
+- **Per-photo notes** — collapsible comment field with autosave; keyboard shortcut `C`
+- **Keyboard-first** — arrows to navigate, `1`–`5` to rate, `P` / `X` / `U` to pick/reject/clear, `Enter` in note to save and advance
 - **Undo/redo** — full undo stack for ratings, flags, selections, and comments
 - **Bulk operations** — checkbox multi-select for applying flags, ratings, or comments to many photos at once
-- **No internet required** — fully offline; all data stays in a local SQLite database beside the photos
+- **Fully offline** — no internet required; all data lives in a local SQLite database beside the photos
 
 ---
 
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
-| Desktop shell | [Tauri v2](https://tauri.app/) |
+|:---|:---|
+| Desktop shell | Tauri v2 |
 | Backend | Rust |
 | Database | SQLite via `rusqlite` (bundled) |
 | Image processing | `image` crate — JPEG/PNG/TIFF decode, resize, watermark compositing |
-| Email (Windows) | Simple MAPI (`MAPISendMail`) via `windows-sys` — native attach-and-compose |
+| Email (Windows) | Simple MAPI (`MAPISendMail`) via `windows-sys` |
 | Frontend | React 18 + TypeScript |
 | Build tool | Vite |
-| Font | [Geist](https://vercel.com/font) |
+| Font | Geist |
 
 ---
 
 ## Architecture
 
 ```
-src/                        React + TypeScript frontend
-  App.tsx                   Single-page app (~3500 lines): all screens,
-                            state, keyboard handling, viewer, grid
-  styles.css / tokens.css   Design tokens + component styles
+src/                      React + TypeScript frontend
+  App.tsx                 Single-page app — all screens, state, keyboard
+                          handling, viewer, grid, undo stack
+  styles.css / tokens.css Design tokens + component styles
 
 src-tauri/src/
-  lib.rs                    All Tauri commands: project creation, image
-                            import, preview generation, export, email
-  db.rs                     SQLite schema, migrations, typed DTOs
-  previews.rs               Parallel preview + thumbnail generation (rayon)
-  text_overlay.rs           Text watermark rendering (fontdue)
-  windows_mapi.rs           Native Windows MAPI email with attachments
-  icon_embed.rs             Embed custom PNG as Windows EXE icon at runtime
+  lib.rs                  Tauri commands — project creation, image import,
+                          preview generation, export, email
+  db.rs                   SQLite schema, migrations, typed DTOs
+  previews.rs             Parallel preview + thumbnail generation (rayon)
+  text_overlay.rs         Text watermark rendering (fontdue)
+  windows_mapi.rs         Native Windows MAPI email with attachments
+  icon_embed.rs           Embed custom PNG as Windows EXE icon at runtime
 ```
 
-**Data flow:**
-- On setup, originals are scanned, previews generated in parallel (rayon), and metadata written to SQLite
-- All client interactions (ratings, flags, comments) write immediately to SQLite with undo entries
-- On export, the Rust backend reads all rows, formats three output files, and optionally deduplicates burst filenames
-- The portable EXE is named after the studio (e.g. `Jane Doe Photography.exe`) and copied beside the database on package creation
+**Data flow:** originals are scanned on setup, previews generated in parallel via rayon, metadata written to SQLite. All client actions (ratings, flags, comments) write immediately with undo entries. Export reads all rows, formats three output files, and deduplicates burst filenames if enabled.
 
 ---
 
-## Key Engineering Decisions
+## Key Decisions
 
-**Why Tauri instead of Electron?**
-Tauri produces a much smaller binary (~5 MB vs ~150 MB) and uses the OS WebView rather than bundling Chromium — important for a tool that photographers ZIP and send to clients.
+**Why Tauri?** Produces a ~5 MB binary using the OS WebView instead of bundling Chromium (~150 MB) — important for a tool photographers ZIP and send to clients.
 
-**Why a local SQLite database?**
-Zero infrastructure. The database lives beside the photos and travels with the ZIP. No accounts, no sync, no server.
+**Why local SQLite?** Zero infrastructure. The database travels with the ZIP. No accounts, no sync, no server.
 
-**Why Simple MAPI for email?**
-`mailto:` URLs can't attach files reliably across mail clients on Windows. MAPI opens a compose window in the user's actual default mail app (Outlook, Thunderbird, etc.) with files pre-attached — one click to send.
-
-**Why a single App.tsx?**
-This app has one screen with a lot of interconnected state (filtered list, detail view, bulk selection, undo stack, keyboard handler, autosave timers). Splitting into many components would introduce prop-drilling or a global store with more boilerplate than benefit at this scale.
-
----
-
-## Screenshots
-
-> Coming soon
+**Why Simple MAPI?** `mailto:` URLs can't attach files reliably across mail clients on Windows. MAPI opens a compose window in the user's actual mail app with files pre-attached.
 
 ---
 
